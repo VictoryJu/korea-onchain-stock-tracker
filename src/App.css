@@ -165,43 +165,93 @@ button {
   border-bottom: 1px solid #eef0f3;
 }
 
-.market-table {
-  width: 100%;
-}
-
-.market-row {
+.market-card-grid {
   display: grid;
-  width: 100%;
-  grid-template-columns: minmax(160px, 1.4fr) repeat(5, minmax(96px, 1fr));
-  gap: 12px;
-  align-items: center;
-  min-height: 64px;
-  padding: 0 18px;
-  border: 0;
-  border-bottom: 1px solid #eef0f3;
-  background: transparent;
-  color: #0a0b0d;
-  text-align: right;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px;
 }
 
-button.market-row {
+.market-card {
+  display: grid;
+  gap: 18px;
+  min-height: 250px;
+  padding: 18px;
+  border: 1px solid #dee1e6;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0a0b0d;
+  text-align: left;
   cursor: pointer;
 }
 
-button.market-row:hover,
-button.market-row.selected {
+.market-card:hover,
+.market-card.selected {
+  border-color: #0052ff;
   background: #f7f9ff;
 }
 
-.market-head {
-  min-height: 42px;
+.card-topline,
+.card-metrics {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-metrics > span {
+  display: grid;
+  gap: 5px;
+}
+
+.card-metrics > span:last-child {
+  text-align: right;
+}
+
+.card-price-block {
+  display: grid;
+  gap: 7px;
+}
+
+.card-price-block strong {
+  font-family: "Coinbase Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.card-price-block small,
+.card-metrics small {
   color: #7c828a;
   font-size: 12px;
   font-weight: 600;
 }
 
-.market-row > :first-child {
-  text-align: left;
+.card-metrics strong {
+  font-family: "Coinbase Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.state-pill {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #0052ff;
+  background: #eef4ff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.state-pill.live {
+  color: #036b42;
+  background: #e9f8f1;
+}
+
+.state-pill.unavailable,
+.state-pill.fallback {
+  color: #7c828a;
+  background: #eef0f3;
 }
 
 .asset-cell {
@@ -332,14 +382,14 @@ button.market-row.selected {
     display: none;
   }
 
-  .market-row {
-    grid-template-columns: 1fr 1fr;
-    min-height: auto;
-    padding: 14px 16px;
-    text-align: left;
+  .market-card-grid {
+    grid-template-columns: 1fr;
+    padding: 14px;
   }
+}
 
-  .market-row span {
-    min-width: 0;
+@media (max-width: 1180px) and (min-width: 981px) {
+  .market-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

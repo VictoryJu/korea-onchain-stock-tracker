@@ -10,5 +10,8 @@ describe('App', () => {
     expect(screen.getAllByText(/USDT\/KRW/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Lighter Perp/i).length).toBeGreaterThan(0);
     expect(screen.getByText('SAMSUNGUSD')).toBeInTheDocument();
+    expect(screen.getByLabelText(/lighter mapped stock cards/i)).toBeInTheDocument();
+    expect(screen.queryByText('NAVER')).not.toBeInTheDocument();
+    expect(screen.queryByText('Kakao')).not.toBeInTheDocument();
   });
 });

@@ -4,7 +4,7 @@ import type { DashboardRow } from './domain/markets';
 import { getDomesticFallbackQuotes } from './services/koreanEquities';
 import { composeDashboardRows, fetchDashboardSnapshot, type DashboardSnapshot } from './services/snapshots';
 
-const POLL_INTERVAL_MS = 10_000;
+const POLL_INTERVAL_MS = 30_000;
 
 const initialSnapshot: DashboardSnapshot = {
   rows: composeDashboardRows({
@@ -31,9 +31,10 @@ export default function App() {
         if (!cancelled) {
           setSnapshot(nextSnapshot);
           setSelectedSymbol((current) => {
-            return nextSnapshot.rows.some((row) => row.stock.symbol === current)
+            const nextVisibleRows = getLighterMappedRows(nextSnapshot.rows);
+            return nextVisibleRows.some((row) => row.stock.symbol === current)
               ? current
-              : nextSnapshot.rows[0]?.stock.symbol ?? current;
+              : nextVisibleRows[0]?.stock.symbol ?? current;
           });
         }
       } finally {
@@ -52,9 +53,10 @@ export default function App() {
     };
   }, []);
 
+  const visibleRows = useMemo(() => getLighterMappedRows(snapshot.rows), [snapshot.rows]);
   const selectedRow = useMemo(() => {
-    return snapshot.rows.find((row) => row.stock.symbol === selectedSymbol) ?? snapshot.rows[0];
-  }, [selectedSymbol, snapshot.rows]);
+    return visibleRows.find((row) => row.stock.symbol === selectedSymbol) ?? visibleRows[0];
+  }, [selectedSymbol, visibleRows]);
 
   return (
     <main className="app-shell">
@@ -72,8 +74,8 @@ export default function App() {
 
       <section className="status-strip" aria-label="Market data status">
         <Metric label="USDT/KRW" value={snapshot.upbit ? formatKrw(snapshot.upbit.usdtKrw) : 'Connecting'} />
-        <Metric label="Lighter Perp" value={countLiveOnchainRows(snapshot.rows).toString()} helper="mapped markets live" />
-        <Metric label="Refresh" value="10s" helper={formatTime(snapshot.updatedAt)} />
+        <Metric label="Lighter Perp" value={countLiveOnchainRows(visibleRows).toString()} helper={`${visibleRows.length} mapped assets`} />
+        <Metric label="Refresh" value="30s" helper={formatTime(snapshot.updatedAt)} />
       </section>
 
       {snapshot.sourceMessages.length > 0 && (
@@ -87,38 +89,54 @@ export default function App() {
         <div className="market-panel">
           <div className="panel-heading">
             <div>
-              <h2>KRX Top Names</h2>
-              <p>Rows stay visible even when an onchain market is not mapped.</p>
+              <h2>Lighter-Mapped Korean Stocks</h2>
+              <p>Only domestic names with an active Lighter perp mapping are shown.</p>
             </div>
             <Wifi size={18} />
           </div>
 
-          <div className="market-table" role="table" aria-label="Korean stocks with Lighter perp prices">
-            <div className="market-row market-head" role="row">
-              <span>Asset</span>
-              <span>Domestic</span>
-              <span>Lighter USD</span>
-              <span>USDT/KRW</span>
-              <span>Gap</span>
-              <span>24h</span>
-            </div>
-            {snapshot.rows.map((row) => (
+          <div className="market-card-grid" aria-label="Lighter mapped stock cards">
+            {visibleRows.map((row) => (
               <button
-                className={`market-row ${selectedRow?.stock.symbol === row.stock.symbol ? 'selected' : ''}`}
+                className={`market-card ${selectedRow?.stock.symbol === row.stock.symbol ? 'selected' : ''}`}
                 key={row.stock.symbol}
                 onClick={() => setSelectedSymbol(row.stock.symbol)}
-                role="row"
                 type="button"
               >
-                <span className="asset-cell">
-                  <strong>{row.stock.shortName}</strong>
-                  <small>{row.stock.symbol}</small>
+                <span className="card-topline">
+                  <span className="asset-cell">
+                    <strong>{row.stock.shortName}</strong>
+                    <small>{row.stock.symbol}</small>
+                  </span>
+                  <span className={`state-pill ${row.onchainState.status}`}>Lighter Perp</span>
                 </span>
-                <span>{row.domestic ? formatKrw(row.domestic.priceKrw) : '-'}</span>
-                <span>{row.lighter ? formatUsd(row.lighter.priceUsd) : row.onchainState.message ?? '-'}</span>
-                <span>{row.convertedPriceKrw ? formatKrw(row.convertedPriceKrw) : '-'}</span>
-                <ChangeCell value={row.gapPercent} />
-                <ChangeCell value={row.lighter?.change24hPercent} />
+
+                <span className="card-price-block">
+                  <small>USDT/KRW converted</small>
+                  <strong>{row.convertedPriceKrw ? formatKrw(row.convertedPriceKrw) : 'Connecting'}</strong>
+                </span>
+
+                <span className="card-metrics">
+                  <span>
+                    <small>Domestic</small>
+                    <strong>{row.domestic ? formatKrw(row.domestic.priceKrw) : '-'}</strong>
+                  </span>
+                  <span>
+                    <small>Lighter USD</small>
+                    <strong>{row.lighter ? formatUsd(row.lighter.priceUsd) : '-'}</strong>
+                  </span>
+                </span>
+
+                <span className="card-metrics">
+                  <span>
+                    <small>Gap</small>
+                    <ChangeCell value={row.gapPercent} />
+                  </span>
+                  <span>
+                    <small>24h</small>
+                    <ChangeCell value={row.lighter?.change24hPercent} />
+                  </span>
+                </span>
               </button>
             ))}
           </div>
@@ -191,6 +209,10 @@ function ChangeCell({ value, suffix = '%' }: { value?: number; suffix?: string }
 
 function countLiveOnchainRows(rows: DashboardRow[]): number {
   return rows.filter((row) => row.onchainState.status === 'live').length;
+}
+
+function getLighterMappedRows(rows: DashboardRow[]): DashboardRow[] {
+  return rows.filter((row) => Boolean(row.stock.lighterSymbol));
 }
 
 function formatKrw(value: number): string {
