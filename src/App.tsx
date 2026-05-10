@@ -1,4 +1,4 @@
-import NumberFlow from '@number-flow/react';
+import NumberFlow, { NumberFlowGroup } from '@number-flow/react';
 import { Activity, AlertCircle, RefreshCw, Wifi } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { DashboardRow, DomesticQuote, LighterQuote } from './domain/markets';
@@ -152,27 +152,31 @@ export default function App() {
                   <strong>{row.convertedPriceKrw ? <AnimatedKrw value={row.convertedPriceKrw} /> : 'Connecting'}</strong>
                 </span>
 
-                <span className="card-metrics">
-                  <span>
-                    <small>Domestic</small>
-                    <strong>{row.domestic ? <AnimatedKrw value={row.domestic.priceKrw} /> : '-'}</strong>
+                <NumberFlowGroup>
+                  <span className="card-metrics">
+                    <span>
+                      <small>Domestic</small>
+                      <strong>{row.domestic ? <AnimatedKrw value={row.domestic.priceKrw} /> : '-'}</strong>
+                    </span>
+                    <span>
+                      <small>Lighter USD</small>
+                      <strong>{row.lighter ? <AnimatedUsd value={row.lighter.priceUsd} /> : '-'}</strong>
+                    </span>
                   </span>
-                  <span>
-                    <small>Lighter USD</small>
-                    <strong>{row.lighter ? <AnimatedUsd value={row.lighter.priceUsd} /> : '-'}</strong>
-                  </span>
-                </span>
+                </NumberFlowGroup>
 
-                <span className="card-metrics">
-                  <span className="card-change-metric">
-                    <small>Gap</small>
-                    <ChangeCell value={row.gapPercent} />
+                <NumberFlowGroup>
+                  <span className="card-metrics">
+                    <span className="card-change-metric">
+                      <small>Gap</small>
+                      <ChangeCell value={row.gapPercent} />
+                    </span>
+                    <span className="card-change-metric">
+                      <small>24h</small>
+                      <ChangeCell value={row.lighter?.change24hPercent} />
+                    </span>
                   </span>
-                  <span className="card-change-metric">
-                    <small>24h</small>
-                    <ChangeCell value={row.lighter?.change24hPercent} />
-                  </span>
-                </span>
+                </NumberFlowGroup>
               </button>
             ))}
           </div>
@@ -198,8 +202,10 @@ function DetailPanel({ row }: { row: DashboardRow }) {
 
       <div className="price-stack">
         <span>Converted onchain price</span>
-        <strong>{row.convertedPriceKrw ? <AnimatedKrw value={row.convertedPriceKrw} /> : 'Unavailable'}</strong>
-        <ChangeCell value={row.gapPercent} suffix=" vs domestic" />
+        <NumberFlowGroup>
+          <strong>{row.convertedPriceKrw ? <AnimatedKrw value={row.convertedPriceKrw} /> : 'Unavailable'}</strong>
+          <ChangeCell value={row.gapPercent} suffix=" vs domestic" />
+        </NumberFlowGroup>
       </div>
 
       <div className="detail-chart" aria-hidden="true">
@@ -259,7 +265,10 @@ function AnimatedKrw({ value }: { value: number }) {
         maximumFractionDigits: value > 1000 ? 0 : 2,
       }}
       locales="ko-KR"
-      trend={(previous, next) => next - previous}
+      opacityTiming={{ duration: 220, easing: 'ease-out' }}
+      spinTiming={{ duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
+      transformTiming={{ duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
+      trend={(previous, next) => Math.sign(next - previous)}
       value={value}
       willChange
     />
@@ -278,7 +287,10 @@ function AnimatedUsd({ value }: { value: number }) {
         maximumFractionDigits: 2,
       }}
       locales="en-US"
-      trend={(previous, next) => next - previous}
+      opacityTiming={{ duration: 220, easing: 'ease-out' }}
+      spinTiming={{ duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
+      transformTiming={{ duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
+      trend={(previous, next) => Math.sign(next - previous)}
       value={value}
       willChange
     />
@@ -296,7 +308,10 @@ function AnimatedPercent({ value, suffix }: { value: number; suffix: string }) {
         signDisplay: 'always',
       }}
       suffix={suffix}
-      trend={(previous, next) => next - previous}
+      opacityTiming={{ duration: 180, easing: 'ease-out' }}
+      spinTiming={{ duration: 620, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
+      transformTiming={{ duration: 620, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
+      trend={(previous, next) => Math.sign(next - previous)}
       value={value}
       willChange
     />

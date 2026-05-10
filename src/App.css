@@ -301,7 +301,16 @@ button {
 
 .number-flow {
   display: inline-block;
+  line-height: 0.85;
   font-variant-numeric: tabular-nums;
+  --number-flow-mask-height: 0.32em;
+  --number-flow-mask-width: 0.42em;
+}
+
+.number-flow::part(prefix),
+.number-flow::part(suffix) {
+  font-size: 0.86em;
+  font-weight: inherit;
 }
 
 .number-flow.flow-up.pulse-a {
