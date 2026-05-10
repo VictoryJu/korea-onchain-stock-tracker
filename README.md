@@ -29,5 +29,6 @@ npm run build
 
 - Lighter values are labeled as perpetual futures, not tokenized spot equities.
 - KRW conversion uses Upbit `KRW-USDT`, so converted prices reflect the local USDT/KRW market rather than an official USD/KRW fixing.
-- Domestic Korean equity rows currently use seed fallback references until a production KRX-compatible market-data provider is connected.
+- Domestic Korean equity rows are fetched through the local Vite API route `/api/domestic/top-turnover`, which calls Naver's mobile stock endpoints server-side to avoid browser CORS failures.
+- The domestic board shows the top Korean stocks by accumulated trading value from Naver market lists, excluding ETF rows, then pins Samsung Electronics, SK Hynix, and Hyundai Motor when they are not already in the top set.
 - Each feed has its own freshness state so Lighter, Upbit, and domestic data failures can be shown independently.
