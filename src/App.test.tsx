@@ -4,7 +4,7 @@ import App from './App';
 
 describe('App', () => {
   it('renders the live market board shell', () => {
-    render(<App />);
+    const { container } = render(<App />);
 
     expect(screen.getByRole('heading', { name: /korea onchain stock tracker/i })).toBeInTheDocument();
     expect(screen.getAllByText(/USDT\/KRW/i).length).toBeGreaterThan(0);
@@ -13,6 +13,7 @@ describe('App', () => {
     expect(screen.getByLabelText(/lighter mapped stock cards/i)).toBeInTheDocument();
     expect(screen.queryByText('NAVER')).not.toBeInTheDocument();
     expect(screen.queryByText('Kakao')).not.toBeInTheDocument();
+    expect(container.querySelectorAll('number-flow-react').length).toBeGreaterThan(0);
   });
 
   it('emphasizes gap and 24h change metrics in the card grid', () => {

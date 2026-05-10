@@ -248,10 +248,11 @@ function ChangeCell({ value, suffix = '%' }: { value?: number; suffix?: string }
 }
 
 function AnimatedKrw({ value }: { value: number }) {
-  const direction = useValueDirection(value);
+  const { direction, pulse } = useValueDirection(value);
   return (
     <NumberFlow
-      className={`number-flow ${direction}`}
+      animated
+      className={`number-flow ${direction} ${pulse}`}
       format={{
         style: 'currency',
         currency: 'KRW',
@@ -266,10 +267,11 @@ function AnimatedKrw({ value }: { value: number }) {
 }
 
 function AnimatedUsd({ value }: { value: number }) {
-  const direction = useValueDirection(value);
+  const { direction, pulse } = useValueDirection(value);
   return (
     <NumberFlow
-      className={`number-flow ${direction}`}
+      animated
+      className={`number-flow ${direction} ${pulse}`}
       format={{
         style: 'currency',
         currency: 'USD',
@@ -286,6 +288,7 @@ function AnimatedUsd({ value }: { value: number }) {
 function AnimatedPercent({ value, suffix }: { value: number; suffix: string }) {
   return (
     <NumberFlow
+      animated
       className="number-flow"
       format={{
         maximumFractionDigits: 2,
@@ -340,23 +343,26 @@ function formatTime(value: string): string {
   }).format(new Date(value));
 }
 
-function useValueDirection(value: number): 'flow-up' | 'flow-down' | 'flow-flat' {
+function useValueDirection(value: number): { direction: 'flow-up' | 'flow-down' | 'flow-flat'; pulse: 'pulse-a' | 'pulse-b' } {
   const previousRef = useRef(value);
   const [direction, setDirection] = useState<'flow-up' | 'flow-down' | 'flow-flat'>('flow-flat');
+  const [pulse, setPulse] = useState<'pulse-a' | 'pulse-b'>('pulse-a');
 
   useEffect(() => {
     const previous = previousRef.current;
     if (value > previous) {
       setDirection('flow-up');
+      setPulse((current) => (current === 'pulse-a' ? 'pulse-b' : 'pulse-a'));
     } else if (value < previous) {
       setDirection('flow-down');
+      setPulse((current) => (current === 'pulse-a' ? 'pulse-b' : 'pulse-a'));
     } else {
       setDirection('flow-flat');
     }
     previousRef.current = value;
   }, [value]);
 
-  return direction;
+  return { direction, pulse };
 }
 
 function chartHeight(value?: number): number {

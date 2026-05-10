@@ -304,12 +304,20 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
-.number-flow.flow-up {
-  animation: price-rise 520ms ease;
+.number-flow.flow-up.pulse-a {
+  animation: price-rise-a 520ms ease;
 }
 
-.number-flow.flow-down {
-  animation: price-fall 520ms ease;
+.number-flow.flow-up.pulse-b {
+  animation: price-rise-b 520ms ease;
+}
+
+.number-flow.flow-down.pulse-a {
+  animation: price-fall-a 520ms ease;
+}
+
+.number-flow.flow-down.pulse-b {
+  animation: price-fall-b 520ms ease;
 }
 
 .detail-panel {
@@ -400,7 +408,7 @@ button {
   }
 }
 
-@keyframes price-rise {
+@keyframes price-rise-a {
   0% {
     color: #05b169;
     transform: translateY(3px);
@@ -411,7 +419,29 @@ button {
   }
 }
 
-@keyframes price-fall {
+@keyframes price-rise-b {
+  0% {
+    color: #05b169;
+    transform: translateY(3px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes price-fall-a {
+  0% {
+    color: #cf202f;
+    transform: translateY(-3px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes price-fall-b {
   0% {
     color: #cf202f;
     transform: translateY(-3px);
