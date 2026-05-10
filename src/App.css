@@ -183,12 +183,26 @@ button {
   color: #0a0b0d;
   text-align: left;
   cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
 .market-card:hover,
 .market-card.selected {
   border-color: #0052ff;
   background: #f7f9ff;
+}
+
+.market-card:hover {
+  transform: translateY(-2px);
+}
+
+.market-card.selected {
+  box-shadow: inset 0 0 0 1px #0052ff;
+  transform: translateY(-1px);
 }
 
 .card-topline,
@@ -285,9 +299,23 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
+.number-flow {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+}
+
+.number-flow.flow-up {
+  animation: price-rise 520ms ease;
+}
+
+.number-flow.flow-down {
+  animation: price-fall 520ms ease;
+}
+
 .detail-panel {
   align-self: start;
   overflow: hidden;
+  animation: detail-in 180ms ease both;
 }
 
 .detail-header {
@@ -357,6 +385,40 @@ button {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes detail-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes price-rise {
+  0% {
+    color: #05b169;
+    transform: translateY(3px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes price-fall {
+  0% {
+    color: #cf202f;
+    transform: translateY(-3px);
+  }
+
+  100% {
+    transform: translateY(0);
   }
 }
 

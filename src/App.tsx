@@ -1,3 +1,4 @@
+import NumberFlow from '@number-flow/react';
 import { Activity, AlertCircle, RefreshCw, Wifi } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { DashboardRow, DomesticQuote, LighterQuote } from './domain/markets';
@@ -148,17 +149,17 @@ export default function App() {
 
                 <span className="card-price-block">
                   <small>USDT/KRW converted</small>
-                  <strong>{row.convertedPriceKrw ? formatKrw(row.convertedPriceKrw) : 'Connecting'}</strong>
+                  <strong>{row.convertedPriceKrw ? <AnimatedKrw value={row.convertedPriceKrw} /> : 'Connecting'}</strong>
                 </span>
 
                 <span className="card-metrics">
                   <span>
                     <small>Domestic</small>
-                    <strong>{row.domestic ? formatKrw(row.domestic.priceKrw) : '-'}</strong>
+                    <strong>{row.domestic ? <AnimatedKrw value={row.domestic.priceKrw} /> : '-'}</strong>
                   </span>
                   <span>
                     <small>Lighter USD</small>
-                    <strong>{row.lighter ? formatUsd(row.lighter.priceUsd) : '-'}</strong>
+                    <strong>{row.lighter ? <AnimatedUsd value={row.lighter.priceUsd} /> : '-'}</strong>
                   </span>
                 </span>
 
@@ -177,7 +178,7 @@ export default function App() {
           </div>
         </div>
 
-        {selectedRow && <DetailPanel row={selectedRow} />}
+        {selectedRow && <DetailPanel key={selectedRow.stock.symbol} row={selectedRow} />}
       </section>
     </main>
   );
@@ -197,7 +198,7 @@ function DetailPanel({ row }: { row: DashboardRow }) {
 
       <div className="price-stack">
         <span>Converted onchain price</span>
-        <strong>{row.convertedPriceKrw ? formatKrw(row.convertedPriceKrw) : 'Unavailable'}</strong>
+        <strong>{row.convertedPriceKrw ? <AnimatedKrw value={row.convertedPriceKrw} /> : 'Unavailable'}</strong>
         <ChangeCell value={row.gapPercent} suffix=" vs domestic" />
       </div>
 
@@ -239,7 +240,64 @@ function ChangeCell({ value, suffix = '%' }: { value?: number; suffix?: string }
   }
 
   const direction = value >= 0 ? 'up' : 'down';
-  return <span className={direction}>{`${value >= 0 ? '+' : ''}${value.toFixed(2)}${suffix}`}</span>;
+  return (
+    <span className={direction}>
+      <AnimatedPercent value={value} suffix={suffix} />
+    </span>
+  );
+}
+
+function AnimatedKrw({ value }: { value: number }) {
+  const direction = useValueDirection(value);
+  return (
+    <NumberFlow
+      className={`number-flow ${direction}`}
+      format={{
+        style: 'currency',
+        currency: 'KRW',
+        maximumFractionDigits: value > 1000 ? 0 : 2,
+      }}
+      locales="ko-KR"
+      trend={(previous, next) => next - previous}
+      value={value}
+      willChange
+    />
+  );
+}
+
+function AnimatedUsd({ value }: { value: number }) {
+  const direction = useValueDirection(value);
+  return (
+    <NumberFlow
+      className={`number-flow ${direction}`}
+      format={{
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 2,
+      }}
+      locales="en-US"
+      trend={(previous, next) => next - previous}
+      value={value}
+      willChange
+    />
+  );
+}
+
+function AnimatedPercent({ value, suffix }: { value: number; suffix: string }) {
+  return (
+    <NumberFlow
+      className="number-flow"
+      format={{
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 2,
+        signDisplay: 'always',
+      }}
+      suffix={suffix}
+      trend={(previous, next) => next - previous}
+      value={value}
+      willChange
+    />
+  );
 }
 
 function countLiveOnchainRows(rows: DashboardRow[]): number {
@@ -274,20 +332,31 @@ function formatKrw(value: number): string {
   }).format(value);
 }
 
-function formatUsd(value: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-  }).format(value);
-}
-
 function formatTime(value: string): string {
   return new Intl.DateTimeFormat('ko-KR', {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
   }).format(new Date(value));
+}
+
+function useValueDirection(value: number): 'flow-up' | 'flow-down' | 'flow-flat' {
+  const previousRef = useRef(value);
+  const [direction, setDirection] = useState<'flow-up' | 'flow-down' | 'flow-flat'>('flow-flat');
+
+  useEffect(() => {
+    const previous = previousRef.current;
+    if (value > previous) {
+      setDirection('flow-up');
+    } else if (value < previous) {
+      setDirection('flow-down');
+    } else {
+      setDirection('flow-flat');
+    }
+    previousRef.current = value;
+  }, [value]);
+
+  return direction;
 }
 
 function chartHeight(value?: number): number {
