@@ -9,5 +9,6 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: /korea onchain stock tracker/i })).toBeInTheDocument();
     expect(screen.getAllByText(/USDT\/KRW/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Lighter Perp/i).length).toBeGreaterThan(0);
+    expect(screen.getByText('SAMSUNG')).toBeInTheDocument();
   });
 });

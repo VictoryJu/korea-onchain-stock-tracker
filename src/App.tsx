@@ -2,25 +2,16 @@ import { Activity, AlertCircle, RefreshCw, Wifi } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import type { DashboardRow } from './domain/markets';
 import { getDomesticFallbackQuotes } from './services/koreanEquities';
-import { fetchDashboardSnapshot, type DashboardSnapshot } from './services/snapshots';
+import { composeDashboardRows, fetchDashboardSnapshot, type DashboardSnapshot } from './services/snapshots';
 
 const POLL_INTERVAL_MS = 10_000;
 
 const initialSnapshot: DashboardSnapshot = {
-  rows: getDomesticFallbackQuotes().map((domestic) => ({
-    stock: {
-      symbol: domestic.symbol,
-      domesticSymbol: domestic.symbol.replace('.KS', ''),
-      name: domestic.name,
-      shortName: domestic.name,
-      exchange: 'KRX',
-    },
-    domestic,
-    onchainState: {
-      status: 'unavailable',
-      message: 'Connecting to Lighter',
-    },
-  })),
+  rows: composeDashboardRows({
+    domestic: getDomesticFallbackQuotes(),
+    lighter: {},
+    lighterError: 'Connecting to Lighter',
+  }),
   sourceMessages: ['Connecting to Lighter, Upbit, and domestic market feeds.'],
   updatedAt: new Date().toISOString(),
 };
