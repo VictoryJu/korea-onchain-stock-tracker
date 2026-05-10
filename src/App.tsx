@@ -4,7 +4,7 @@ import type { DashboardRow } from './domain/markets';
 import { getDomesticFallbackQuotes } from './services/koreanEquities';
 import { composeDashboardRows, fetchDashboardSnapshot, type DashboardSnapshot } from './services/snapshots';
 
-const POLL_INTERVAL_MS = 30_000;
+const POLL_INTERVAL_MS = 10_000;
 
 const initialSnapshot: DashboardSnapshot = {
   rows: composeDashboardRows({
@@ -75,7 +75,7 @@ export default function App() {
       <section className="status-strip" aria-label="Market data status">
         <Metric label="USDT/KRW" value={snapshot.upbit ? formatKrw(snapshot.upbit.usdtKrw) : 'Connecting'} />
         <Metric label="Lighter Perp" value={countLiveOnchainRows(visibleRows).toString()} helper={`${visibleRows.length} mapped assets`} />
-        <Metric label="Refresh" value="30s" helper={formatTime(snapshot.updatedAt)} />
+        <Metric label="Refresh" value="10s" helper={formatTime(snapshot.updatedAt)} />
       </section>
 
       {snapshot.sourceMessages.length > 0 && (
