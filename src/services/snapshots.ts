@@ -23,9 +23,15 @@ export type SnapshotInput = {
 
 export type DashboardSnapshot = {
   rows: DashboardRow[];
+  lighter: Record<string, LighterQuote>;
   upbit?: UpbitQuote;
   sourceMessages: string[];
   updatedAt: string;
+};
+
+export type FetchDashboardSnapshotOptions = {
+  lighter?: Record<string, LighterQuote>;
+  fetchLighter?: boolean;
 };
 
 export function composeDashboardRows(input: SnapshotInput): DashboardRow[] {
@@ -74,10 +80,11 @@ export function composeDashboardRows(input: SnapshotInput): DashboardRow[] {
   });
 }
 
-export async function fetchDashboardSnapshot(): Promise<DashboardSnapshot> {
+export async function fetchDashboardSnapshot(options: FetchDashboardSnapshotOptions = {}): Promise<DashboardSnapshot> {
+  const shouldFetchLighter = options.fetchLighter ?? true;
   const [domesticResult, lighterResult, upbitResult] = await Promise.allSettled([
     fetchDomesticQuotes(),
-    fetchLighterQuotes(),
+    shouldFetchLighter ? fetchLighterQuotes() : Promise.resolve(options.lighter ?? {}),
     fetchUpbitUsdtKrw(),
   ]);
 
@@ -108,6 +115,7 @@ export async function fetchDashboardSnapshot(): Promise<DashboardSnapshot> {
       lighterError: lighterResult.status === 'rejected' ? formatError(lighterResult.reason) : undefined,
       upbitError: upbitResult.status === 'rejected' ? formatError(upbitResult.reason) : undefined,
     }),
+    lighter,
     upbit,
     sourceMessages,
     updatedAt: new Date().toISOString(),

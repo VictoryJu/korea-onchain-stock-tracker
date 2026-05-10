@@ -14,4 +14,11 @@ describe('App', () => {
     expect(screen.queryByText('NAVER')).not.toBeInTheDocument();
     expect(screen.queryByText('Kakao')).not.toBeInTheDocument();
   });
+
+  it('emphasizes gap and 24h change metrics in the card grid', () => {
+    render(<App />);
+
+    expect(screen.getAllByText('Gap')[0].closest('.card-change-metric')).not.toBeNull();
+    expect(screen.getAllByText('24h')[0].closest('.card-change-metric')).not.toBeNull();
+  });
 });

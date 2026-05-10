@@ -233,6 +233,13 @@ button {
   font-weight: 600;
 }
 
+.card-change-metric small,
+.card-change-metric .up,
+.card-change-metric .down,
+.card-change-metric .muted {
+  font-weight: 700;
+}
+
 .state-pill {
   flex: 0 0 auto;
   padding: 5px 8px;

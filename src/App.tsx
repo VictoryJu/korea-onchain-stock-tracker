@@ -1,7 +1,8 @@
 import { Activity, AlertCircle, RefreshCw, Wifi } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import type { DashboardRow } from './domain/markets';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { DashboardRow, DomesticQuote, LighterQuote } from './domain/markets';
 import { getDomesticFallbackQuotes } from './services/koreanEquities';
+import { createLighterMarketStatsStream, type LighterStreamStatus } from './services/lighterStream';
 import { composeDashboardRows, fetchDashboardSnapshot, type DashboardSnapshot } from './services/snapshots';
 
 const POLL_INTERVAL_MS = 10_000;
@@ -12,6 +13,7 @@ const initialSnapshot: DashboardSnapshot = {
     lighter: {},
     lighterError: 'Connecting to Lighter',
   }),
+  lighter: {},
   sourceMessages: ['Connecting to Lighter, Upbit, and domestic market feeds.'],
   updatedAt: new Date().toISOString(),
 };
@@ -20,15 +22,21 @@ export default function App() {
   const [snapshot, setSnapshot] = useState<DashboardSnapshot>(initialSnapshot);
   const [selectedSymbol, setSelectedSymbol] = useState('005930.KS');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lighterStreamStatus, setLighterStreamStatus] = useState<LighterStreamStatus>('connecting');
+  const lighterQuotesRef = useRef<Record<string, LighterQuote>>(initialSnapshot.lighter);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function refresh() {
+    async function refresh(fetchLighter: boolean) {
       setIsRefreshing(true);
       try {
-        const nextSnapshot = await fetchDashboardSnapshot();
+        const nextSnapshot = await fetchDashboardSnapshot({
+          fetchLighter,
+          lighter: lighterQuotesRef.current,
+        });
         if (!cancelled) {
+          lighterQuotesRef.current = nextSnapshot.lighter;
           setSnapshot(nextSnapshot);
           setSelectedSymbol((current) => {
             const nextVisibleRows = getLighterMappedRows(nextSnapshot.rows);
@@ -44,13 +52,40 @@ export default function App() {
       }
     }
 
-    void refresh();
-    const timer = window.setInterval(refresh, POLL_INTERVAL_MS);
+    void refresh(true);
+    const timer = window.setInterval(() => refresh(false), POLL_INTERVAL_MS);
 
     return () => {
       cancelled = true;
       window.clearInterval(timer);
     };
+  }, []);
+
+  useEffect(() => {
+    return createLighterMarketStatsStream({
+      onStatus: setLighterStreamStatus,
+      onQuotes: (quotes) => {
+        const nextLighter = {
+          ...lighterQuotesRef.current,
+          ...quotes,
+        };
+        lighterQuotesRef.current = nextLighter;
+        setSnapshot((current) => {
+          const domestic = getDomesticRows(current.rows);
+          return {
+            ...current,
+            rows: composeDashboardRows({
+              domestic,
+              lighter: nextLighter,
+              upbit: current.upbit,
+            }),
+            lighter: nextLighter,
+            sourceMessages: current.sourceMessages.filter((message) => !message.startsWith('Lighter data failed:')),
+            updatedAt: new Date().toISOString(),
+          };
+        });
+      },
+    });
   }, []);
 
   const visibleRows = useMemo(() => getLighterMappedRows(snapshot.rows), [snapshot.rows]);
@@ -75,7 +110,7 @@ export default function App() {
       <section className="status-strip" aria-label="Market data status">
         <Metric label="USDT/KRW" value={snapshot.upbit ? formatKrw(snapshot.upbit.usdtKrw) : 'Connecting'} />
         <Metric label="Lighter Perp" value={countLiveOnchainRows(visibleRows).toString()} helper={`${visibleRows.length} mapped assets`} />
-        <Metric label="Refresh" value="10s" helper={formatTime(snapshot.updatedAt)} />
+        <Metric label="Lighter Feed" value={formatStreamStatus(lighterStreamStatus)} helper={`Domestic/FX 10s · ${formatTime(snapshot.updatedAt)}`} />
       </section>
 
       {snapshot.sourceMessages.length > 0 && (
@@ -128,11 +163,11 @@ export default function App() {
                 </span>
 
                 <span className="card-metrics">
-                  <span>
+                  <span className="card-change-metric">
                     <small>Gap</small>
                     <ChangeCell value={row.gapPercent} />
                   </span>
-                  <span>
+                  <span className="card-change-metric">
                     <small>24h</small>
                     <ChangeCell value={row.lighter?.change24hPercent} />
                   </span>
@@ -213,6 +248,22 @@ function countLiveOnchainRows(rows: DashboardRow[]): number {
 
 function getLighterMappedRows(rows: DashboardRow[]): DashboardRow[] {
   return rows.filter((row) => Boolean(row.stock.lighterSymbol));
+}
+
+function getDomesticRows(rows: DashboardRow[]): DomesticQuote[] {
+  return rows.map((row) => row.domestic).filter((domestic): domestic is DomesticQuote => Boolean(domestic));
+}
+
+function formatStreamStatus(status: LighterStreamStatus): string {
+  if (status === 'live') {
+    return 'Socket';
+  }
+
+  if (status === 'fallback') {
+    return 'REST fallback';
+  }
+
+  return status === 'closed' ? 'Closed' : 'Connecting';
 }
 
 function formatKrw(value: number): string {
