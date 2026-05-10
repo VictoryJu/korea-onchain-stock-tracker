@@ -266,6 +266,7 @@ function AnimatedKrw({ value }: { value: number }) {
       }}
       locales="ko-KR"
       opacityTiming={{ duration: 220, easing: 'ease-out' }}
+      respectMotionPreference={false}
       spinTiming={{ duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
       transformTiming={{ duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
       trend={(previous, next) => Math.sign(next - previous)}
@@ -288,6 +289,7 @@ function AnimatedUsd({ value }: { value: number }) {
       }}
       locales="en-US"
       opacityTiming={{ duration: 220, easing: 'ease-out' }}
+      respectMotionPreference={false}
       spinTiming={{ duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
       transformTiming={{ duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
       trend={(previous, next) => Math.sign(next - previous)}
@@ -309,6 +311,7 @@ function AnimatedPercent({ value, suffix }: { value: number; suffix: string }) {
       }}
       suffix={suffix}
       opacityTiming={{ duration: 180, easing: 'ease-out' }}
+      respectMotionPreference={false}
       spinTiming={{ duration: 620, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
       transformTiming={{ duration: 620, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
       trend={(previous, next) => Math.sign(next - previous)}
