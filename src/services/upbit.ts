@@ -29,10 +29,30 @@ export function parseUpbitTicker(payload: unknown): UpbitQuote {
 }
 
 export async function fetchUpbitUsdtKrw(): Promise<UpbitQuote> {
-  const response = await fetch('https://api.upbit.com/v1/ticker?markets=KRW-USDT');
+  const response = await fetch('/api/upbit/usdt-krw');
   if (!response.ok) {
     throw new Error(`Upbit request failed with ${response.status}`);
   }
 
-  return parseUpbitTicker(await response.json());
+  return parseUpbitProxyPayload(await response.json());
+}
+
+function parseUpbitProxyPayload(payload: unknown): UpbitQuote {
+  if (typeof payload !== 'object' || payload === null) {
+    throw new Error('Upbit proxy payload was not an object');
+  }
+
+  const quote = payload as Partial<UpbitQuote>;
+  const usdtKrw = Number(quote.usdtKrw);
+  if (!Number.isFinite(usdtKrw) || usdtKrw <= 0) {
+    throw new Error('Upbit proxy payload did not include a valid usdtKrw value');
+  }
+
+  return {
+    usdtKrw,
+    source: quote.source ?? {
+      status: 'live',
+      updatedAt: new Date().toISOString(),
+    },
+  };
 }
