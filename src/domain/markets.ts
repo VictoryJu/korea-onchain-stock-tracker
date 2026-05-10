@@ -50,7 +50,7 @@ export const trackedStocks: TrackedStock[] = [
   {
     symbol: '005930.KS',
     domesticSymbol: '005930',
-    lighterSymbol: 'SAMSUNG',
+    lighterSymbol: 'SAMSUNGUSD',
     name: 'Samsung Electronics',
     shortName: 'Samsung',
     exchange: 'KRX',
@@ -59,7 +59,7 @@ export const trackedStocks: TrackedStock[] = [
   {
     symbol: '000660.KS',
     domesticSymbol: '000660',
-    lighterSymbol: 'SKHYNIX',
+    lighterSymbol: 'SKHYNIXUSD',
     name: 'SK Hynix',
     shortName: 'SK Hynix',
     exchange: 'KRX',
@@ -68,7 +68,7 @@ export const trackedStocks: TrackedStock[] = [
   {
     symbol: '005380.KS',
     domesticSymbol: '005380',
-    lighterSymbol: 'HYUNDAI',
+    lighterSymbol: 'HYUNDAIUSD',
     name: 'Hyundai Motor',
     shortName: 'Hyundai',
     exchange: 'KRX',

@@ -15,7 +15,7 @@ describe('market domain helpers', () => {
   });
 
   it('contains initial Lighter mappings for Samsung and SK Hynix', () => {
-    expect(trackedStocks.find((stock) => stock.symbol === '005930.KS')?.lighterSymbol).toBe('SAMSUNG');
-    expect(trackedStocks.find((stock) => stock.symbol === '000660.KS')?.lighterSymbol).toBe('SKHYNIX');
+    expect(trackedStocks.find((stock) => stock.symbol === '005930.KS')?.lighterSymbol).toBe('SAMSUNGUSD');
+    expect(trackedStocks.find((stock) => stock.symbol === '000660.KS')?.lighterSymbol).toBe('SKHYNIXUSD');
   });
 });

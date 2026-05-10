@@ -1,6 +1,6 @@
 import type { LighterQuote } from '../domain/markets';
 
-const TRACKED_LIGHTER_SYMBOLS = new Set(['SAMSUNG', 'SKHYNIX', 'HYUNDAI', 'KRCOMP']);
+const TRACKED_LIGHTER_SYMBOLS = new Set(['SAMSUNGUSD', 'SKHYNIXUSD', 'HYUNDAIUSD', 'KRCOMP']);
 
 type LighterQuoteMap = Record<string, LighterQuote>;
 
@@ -22,7 +22,17 @@ export function parseLighterMarkets(payload: unknown): LighterQuoteMap {
       continue;
     }
 
-    const priceUsd = readNumber(row, ['last_price', 'lastPrice', 'mark_price', 'markPrice', 'index_price', 'indexPrice', 'price']);
+    const priceUsd = readNumber(row, [
+      'last_trade_price',
+      'lastTradePrice',
+      'last_price',
+      'lastPrice',
+      'mark_price',
+      'markPrice',
+      'index_price',
+      'indexPrice',
+      'price',
+    ]);
     if (priceUsd === undefined || priceUsd <= 0) {
       continue;
     }

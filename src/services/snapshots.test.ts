@@ -14,8 +14,8 @@ describe('composeDashboardRows', () => {
       },
     ];
     const lighter: Record<string, LighterQuote> = {
-      SAMSUNG: {
-        symbol: 'SAMSUNG',
+      SAMSUNGUSD: {
+        symbol: 'SAMSUNGUSD',
         priceUsd: 52,
         change24hPercent: 1.3,
         source: { status: 'live' },
