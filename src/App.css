@@ -1,9 +1,9 @@
 :root {
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+    "Coinbase Sans", Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #0a0b0d;
-  background: #f7f8fa;
+  background: #f7f7f7;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -17,7 +17,329 @@ body {
   min-width: 320px;
 }
 
+button {
+  font: inherit;
+}
+
 .app-shell {
   min-height: 100vh;
-  padding: 32px;
+  padding: 24px;
+  background: #f7f7f7;
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto 20px;
+  padding: 18px 0;
+}
+
+.brand-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #0052ff;
+  font-weight: 700;
+}
+
+.topbar h1,
+.panel-heading h2,
+.detail-header h2 {
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.topbar h1 {
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.topbar p,
+.panel-heading p,
+.detail-header p {
+  margin: 5px 0 0;
+  color: #5b616e;
+}
+
+.topbar-status,
+.notice-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.topbar-status {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #dee1e6;
+  border-radius: 999px;
+  color: #0a0b0d;
+  background: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.status-strip,
+.dashboard-grid,
+.notice-bar {
+  max-width: 1280px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.status-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metric,
+.market-panel,
+.detail-panel,
+.notice-bar {
+  border: 1px solid #dee1e6;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.metric {
+  min-height: 88px;
+  padding: 14px 16px;
+}
+
+.metric span,
+.eyebrow,
+.detail-list dt {
+  color: #7c828a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 8px;
+  font-family: "Coinbase Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 22px;
+  letter-spacing: 0;
+}
+
+.metric small {
+  display: block;
+  margin-top: 4px;
+  color: #7c828a;
+}
+
+.notice-bar {
+  min-height: 44px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  color: #5b616e;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 16px;
+}
+
+.panel-heading,
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.market-table {
+  width: 100%;
+}
+
+.market-row {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(160px, 1.4fr) repeat(5, minmax(96px, 1fr));
+  gap: 12px;
+  align-items: center;
+  min-height: 64px;
+  padding: 0 18px;
+  border: 0;
+  border-bottom: 1px solid #eef0f3;
+  background: transparent;
+  color: #0a0b0d;
+  text-align: right;
+}
+
+button.market-row {
+  cursor: pointer;
+}
+
+button.market-row:hover,
+button.market-row.selected {
+  background: #f7f9ff;
+}
+
+.market-head {
+  min-height: 42px;
+  color: #7c828a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.market-row > :first-child {
+  text-align: left;
+}
+
+.asset-cell {
+  display: grid;
+  gap: 4px;
+}
+
+.asset-cell strong {
+  font-weight: 600;
+}
+
+.asset-cell small,
+.muted {
+  color: #7c828a;
+}
+
+.up {
+  color: #05b169;
+  font-variant-numeric: tabular-nums;
+}
+
+.down {
+  color: #cf202f;
+  font-variant-numeric: tabular-nums;
+}
+
+.detail-panel {
+  align-self: start;
+  overflow: hidden;
+}
+
+.detail-header {
+  border-bottom: 0;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+}
+
+.price-stack {
+  padding: 0 18px 18px;
+}
+
+.price-stack span {
+  color: #5b616e;
+}
+
+.price-stack strong {
+  display: block;
+  margin: 8px 0;
+  font-family: "Coinbase Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 34px;
+  font-weight: 600;
+}
+
+.detail-chart {
+  display: flex;
+  align-items: flex-end;
+  height: 180px;
+  margin: 0 18px 18px;
+  padding: 12px;
+  border: 1px solid #eef0f3;
+  border-radius: 8px;
+  background:
+    linear-gradient(#eef0f3 1px, transparent 1px) 0 0 / 100% 25%,
+    #ffffff;
+}
+
+.detail-chart div {
+  width: 100%;
+  min-height: 12%;
+  border-radius: 6px 6px 0 0;
+  background: #0052ff;
+}
+
+.detail-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0 18px 18px;
+}
+
+.detail-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid #eef0f3;
+}
+
+.detail-list dd {
+  margin: 0;
+  text-align: right;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 980px) {
+  .dashboard-grid,
+  .status-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-panel {
+    order: -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    padding: 14px;
+  }
+
+  .topbar {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .topbar-status {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+
+  .market-head {
+    display: none;
+  }
+
+  .market-row {
+    grid-template-columns: 1fr 1fr;
+    min-height: auto;
+    padding: 14px 16px;
+    text-align: left;
+  }
+
+  .market-row span {
+    min-width: 0;
+  }
 }
